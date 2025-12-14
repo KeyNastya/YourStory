@@ -1,0 +1,24 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Проекты
+{% endblock %}
+
+
+{% block content %}
+  <h1>Проекты</h1>
+  
+  {% if user.is_authenticated %}
+      {% if allprojects %}
+        <ul>
+          {% for project in allprojects %}
+            <li><a href="details/{{ project.id }}">{{ project.name }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>У вас еще нет проектов. <a href="#">Создайте первый проект!</a></p>
+      {% endif %}
+    {% else %}
+      <p>Чтобы видеть свои проекты, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
+  {% endif %}
+{% endblock %}

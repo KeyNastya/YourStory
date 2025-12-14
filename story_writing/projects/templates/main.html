@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YourStory - Главная</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}"> 
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">
+                <h1 class="site-title">YourStory</h1>
+            </div>
+            
+            <nav class="header-nav">
+                {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="logout-btn">Выйти</a>
+                {% else %}
+                    <!-- Если пользователь не авторизован -->
+                    <a href="{% url 'login' %}" class="login-btn">Войти</a>
+                    <a href="{% url 'register' %}" class="register-btn">Регистрация</a>
+                {% endif %}
+                </nav>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT: Основное содержимое страницы ===== -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Заголовок страницы -->
+            <h1 class="main-title">YourStory</h1>
+            
+            <!-- Основной заголовок -->
+            <h2 class="main-subtitle">Воплоти свои идеи в жизнь в удобном и бесплатном редакторе</h2>
+            
+            <!-- Первый блок описания -->
+            <div class="content-block">
+                <p>Здесь вы можете создавать произведения, в том числе, 
+                и в рамках одной истории - сценарии, комиксы, пьесы,
+                книги - всё это, основываясь на схеме проекта с описаниями 
+                персонажей, локаций и мира вашей истории.</p>
+                <p>По количеству проектов нет никаких ограничений - создавайте 
+                самые разные наработки и наслаждайтесь творчеством!</p>
+            </div>
+            
+            <!-- Блок "Храни все истории в одном месте" -->
+            <div class="content-block">
+                <h3>Храни все истории в одном месте</h3>
+                <p>Для каждого нового проекта можно создать отдельную папку, в которой 
+                будут храниться все дополнительные и вспомогательные материалы, 
+                включая карточки персонажей, логику мира и наработки по сценарию.</p>
+                <!-- Ссылка для создания проекта -->
+                <p>
+                    {% if user.is_authenticated %}
+                        <a href="projects/" class="action-link">Создать проект <i class="fas fa-arrow-right"></i></a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="action-link">Создать проект <i class="fas fa-arrow-right"></i></a>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- Блок "Создавай карточки персонажей" -->
+            <div class="content-block">
+                <h3>Создавай карточки персонажей</h3>
+                <p>Заполни их основными характеристиками, описанием внешности и 
+                способностей твоего персонажа. Их можно будет открыть в любой 
+                момент для того, чтобы вспомнить детали твоей истории.</p>
+                <!-- Ссылка для создания карточки персонажа -->
+                <p>
+                    {% if user.is_authenticated %}
+                        <a href="characters/" class="action-link">Создать карточку персонажа <i class="fas fa-arrow-right"></i></a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="action-link">Создать карточку персонажа <i class="fas fa-arrow-right"></i></a>
+                    {% endif %}
+                </p>
+            </div>
+            
+        </div>
+    </main>
+    <!-- ===== КОНЕЦ MAIN CONTENT ===== -->
+
+    <!-- ===== FOOTER: Подвал сайта с правилами ===== -->
+    <footer class="site-footer" id="rules">
+        <div class="container">
+
+            <!-- Список правил -->
+            <div class="rules-list">
+                <div class="rule-item">
+                    <h4><i class="fas fa-user-check"></i> Авторская ответственность</h4>
+                    <p>Все произведения создаются под ответственностью автора. Администрация не проверяет контент.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <h4><i class="fas fa-shield-alt"></i> Конфиденциальность</h4>
+                    <p>Мы защищаем ваши персональные данные и не передаем их третьим лицам без вашего согласия.</p>
+                </div>
+                
+            </div>
+            
+            <!-- Дополнительная информация в футере -->
+            <div class="footer-bottom">
+                <p class="copyright">© 2023 YourStory. Все права защищены.</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-question-circle"></i> Помощь</a>
+                    <a href="#"><i class="fas fa-envelope"></i> Контакты</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== КОНЕЦ FOOTER ===== -->
+
+</body>
+</html>

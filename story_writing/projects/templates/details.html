@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Детали проекта "{{ project.name }}"
+{% endblock %}
+
+
+{% block content %}
+  <h1>{{ project.name }}</h1>
+  
+  <p><a href="/chapters">Главы</a></p>
+  <p><a href="/characters">Персонажи</a></p>
+  
+  <p>Назад к <a href="/projects">проектам</a></p>
+  
+{% endblock %}
