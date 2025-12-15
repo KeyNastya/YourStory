@@ -6,19 +6,158 @@
 
 
 {% block content %}
-  <h1>Проекты</h1>
+<div class="projects-container">
+  <!-- Новый контейнер для заголовка и кнопки -->
+  <div class="page-header-section">
+    <a href="{% url 'main' %}" class="back-to-main-btn">
+      ← На главную
+    </a>
+    <h1>Проекты</h1>
+  </div>
+  
+  <div class="projects-header">
+    {% if user.is_authenticated %}
+      <button class="create-project-btn" id="openCreateModal">
+        + Создать новый проект
+      </button>
+    {% endif %}
+  </div>
   
   {% if user.is_authenticated %}
-      {% if allprojects %}
-        <ul>
-          {% for project in allprojects %}
-            <li><a href="details/{{ project.id }}">{{ project.name }}</a></li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>У вас еще нет проектов. <a href="#">Создайте первый проект!</a></p>
-      {% endif %}
+    {% if allprojects %}
+      <div class="projects-grid">
+        {% for project in allprojects %}
+          <div class="project-card">
+            <h3>{{ project.name }}</h3>
+            <div class="project-actions">
+              <a href="details/{{ project.id }}" class="view-btn">Открыть</a>
+              <button class="delete-btn" data-project-name="{{ project.name }}">Удалить</button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     {% else %}
-      <p>Чтобы видеть свои проекты, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
+      <div class="no-projects">
+        <p>У вас еще нет проектов.</p>
+        <button class="create-first-btn" id="openCreateModalEmpty">Создать первый проект</button>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="auth-required">
+      <p>Чтобы видеть свои проекты, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a>.</p>
+    </div>
   {% endif %}
+</div>
+
+<div class="modal" id="createProjectModal">
+  <div class="modal-content">
+    <span class="close" id="closeCreateModal">&times;</span>
+    <h2>Создать новый проект</h2>
+    
+    <form method="post" action="{% url 'create_project_api' %}">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="projectName">Название проекта*</label>
+        <input type="text" id="projectName" name="name" 
+               placeholder="Введите название проекта" required>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+            Создать проект
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal" id="deleteConfirmModal">
+  <div class="modal-content">
+    <span class="close" id="closeDeleteModal">&times;</span>
+    <h2>Подтверждение удаления</h2>
+    
+    <div class="confirm-message">
+      <p>Вы действительно хотите удалить проект? <span id="projectNameToDelete"></span>?</p>
+      <p class="warning-text">Это действие нельзя отменить!</p>
+    </div>
+    
+    <div class="form-actions">
+      <form method="post" action="{% url 'delete_project_api' %}" id="deleteForm">
+        {% csrf_token %}
+        <input type="hidden" name="project_id" id="deleteProjectId">
+        <button type="submit" class="submit-btn delete-confirm-btn">
+            Удалить
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Элементы модального окна создания
+  const createModal = document.getElementById('createProjectModal');
+  const closeCreateBtn = document.getElementById('closeCreateModal');
+  
+  // Элементы модального окна удаления
+  const deleteModal = document.getElementById('deleteConfirmModal');
+  const closeDeleteBtn = document.getElementById('closeDeleteModal');
+  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+  const deleteForm = document.getElementById('deleteForm');
+  const projectNameToDelete = document.getElementById('projectNameToDelete');
+  const deleteProjectId = document.getElementById('deleteProjectId');
+  
+  // Открыть модальное окно создания проекта
+  document.querySelectorAll('[id^="openCreateModal"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      createModal.style.display = 'block';
+      document.getElementById('projectName').focus();
+    });
+  });
+  
+  // Закрыть модальное окно создания
+  closeCreateBtn.addEventListener('click', () => {
+    createModal.style.display = 'none';
+  });
+  
+  // Обработчики для кнопок удаления
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const projectId = this.getAttribute('data-project-id');
+      const projectName = this.getAttribute('data-project-name');
+      
+      projectNameToDelete.textContent = `"${projectName}"`;
+      deleteProjectId.value = projectId;
+      deleteModal.style.display = 'block';
+    });
+  });
+  
+  // Закрыть модальное окно удаления
+  closeDeleteBtn.addEventListener('click', () => {
+    deleteModal.style.display = 'none';
+  });
+  
+  cancelDeleteBtn.addEventListener('click', () => {
+    deleteModal.style.display = 'none';
+  });
+  
+  // Закрыть при клике вне области модальных окон
+  window.addEventListener('click', (e) => {
+    if (e.target === createModal) {
+      createModal.style.display = 'none';
+    }
+    if (e.target === deleteModal) {
+      deleteModal.style.display = 'none';
+    }
+  });
+  
+  // Очистить форму создания при закрытии
+  createModal.addEventListener('hidden', function() {
+    const form = document.querySelector('#createProjectModal form');
+    if (form) {
+      form.reset();
+    }
+  });
+</script>
 {% endblock %}

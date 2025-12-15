@@ -1,0 +1,62 @@
+{% extends "master.html" %}
+
+{% block title %}
+  Все главы
+{% endblock %}
+
+{% block content %}
+<div class="chapters-page-container">
+  <div class="chapters-page-header">
+    <div class="chapters-header-top">
+      <h1>Все главы</h1>
+      <a href="{% url 'projects' %}" class="back-btn">
+        ← Назад к проектам
+      </a>
+    </div>
+    <p class="chapters-description">Все главы из всех ваших проектов</p>
+  </div>
+  
+  {% if chapters_by_project %}
+    <div class="projects-chapters-list">
+      {% for project, chapters in chapters_by_project.items %}
+        <div class="project-chapters-section">
+          <div class="project-chapters-header">
+            <h2>{{ project.name }}</h2>
+            <span class="project-chapters-count">{{ chapters|length }} глав</span>
+          </div>
+          
+          <div class="project-chapters-list">
+            {% for chapter in chapters %}
+              <div class="chapter-item">
+                <div class="chapter-item-header">
+                  <h3>{{ chapter.title }}</h3>
+                  <span class="chapter-item-number">Глава {{ forloop.counter }}</span>
+                </div>
+                {% if chapter.content %}
+                  <p class="chapter-item-preview">{{ chapter.content|truncatechars:150 }}</p>
+                {% endif %}
+                <div class="chapter-item-footer">
+                  <a href="{% url 'details' project.id %}" class="go-to-project-btn">
+                    Перейти к проекту →
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="no-chapters-global">
+      <div class="no-chapters-icon">
+        <i class="fas fa-book-open"></i>
+      </div>
+      <h3>Пока нет ни одной главы</h3>
+      <p>Создайте проект и добавьте в него первую главу</p>
+      <a href="{% url 'projects' %}" class="create-project-link">
+        Создать проект
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

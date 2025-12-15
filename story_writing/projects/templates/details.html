@@ -1,16 +1,113 @@
 {% extends "master.html" %}
 
 {% block title %}
-  Детали проекта "{{ project.name }}"
+  {{ project.name }} - Детали проекта
 {% endblock %}
 
-
 {% block content %}
-  <h1>{{ project.name }}</h1>
+<div class="details-container">
+  <!-- Шапка проекта -->
+  <div class="details-header">
+    <div class="details-header-top">
+      <h1>{{ project.name }}</h1>
+      <div class="header-actions">
+        <a href="{% url 'projects' %}" class="back-btn">
+          ← Назад к проектам
+        </a>
+        {% if user.is_authenticated %}
+          <button class="create-chapter-btn" id="openCreateChapterModal">
+            + Добавить главу
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Основной контент -->
+  <div class="details-content">
+    <div class="chapters-section">
+      <div class="section-header">
+        <h2>Главы проекта</h2>
+        <span class="chapters-count">{{ chapters|length }} глав</span>
+      </div>
+      
+      {% if chapters %}
+        <div class="chapters-grid">
+          {% for chapter in chapters %}
+            <div class="chapter-card">
+              <h3>{{ chapter.title }}</h3>
+              {% if chapter.content %}
+                <p class="chapter-content">{{ chapter.content|truncatechars:150 }}</p>
+              {% else %}
+                <p class="no-content">Текст главы пока не добавлен</p>
+              {% endif %}
+              <div class="chapter-actions">
+                <form method="post" action="{% url 'delete_chapter_api' project.id %}" class="delete-chapter-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="chapter_id" value="{{ chapter.id }}">
+                    <button type="submit" class="delete-btn" onclick="return confirm('Удалить главу?')">
+                        Удалить главу
+                    </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="no-chapters">
+          <p>В этом проекте еще нет глав. Добавьте первую!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для создания главы -->
+<div class="modal" id="createChapterModal">
+  <div class="modal-content">
+    <span class="close" id="closeCreateChapterModal">&times;</span>
+    <h2>Добавить новую главу</h2>
+    
+    <form method="post" action="{% url 'create_chapter_api' project.id %}" id="createChapterForm">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="chapterTitle">Название главы*</label>
+        <input type="text" id="chapterTitle" name="title" 
+               placeholder="Введите название главы" required>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+          Создать главу
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Элементы модального окна
+  const createChapterModal = document.getElementById('createChapterModal');
+  const closeCreateChapterBtn = document.getElementById('closeCreateChapterModal');
+  const openCreateChapterBtn = document.getElementById('openCreateChapterModal');
   
-  <p><a href="/chapters">Главы</a></p>
-  <p><a href="/characters">Персонажи</a></p>
+  // Открыть модальное окно создания главы
+  openCreateChapterBtn.addEventListener('click', () => {
+    createChapterModal.style.display = 'block';
+    document.getElementById('chapterTitle').focus();
+  });
   
-  <p>Назад к <a href="/projects">проектам</a></p>
+  // Закрыть модальное окно создания главы
+  closeCreateChapterBtn.addEventListener('click', () => {
+    createChapterModal.style.display = 'none';
+  });
   
+  // Закрыть при клике вне окна
+  window.addEventListener('click', (e) => {
+    if (e.target === createChapterModal) {
+      createChapterModal.style.display = 'none';
+    }
+  });
+</script>
 {% endblock %}
